@@ -1,46 +1,150 @@
-# Getting Started with Create React App
+# Project Status Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, interactive Proof of Concept (POC) for a Project Status Dashboard web application built with React, TypeScript, and Tailwind CSS.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+### Authentication
+- **Login Screen**: Clean, professional login interface with form validation
+- **User Management**: Role-based access control (Admin, Manager, Developer, Client)
+- **Session Management**: Simulated authentication flow
 
-### `npm start`
+### Dashboard Overview
+- **Project Overview**: Visual progress indicators with donut charts
+- **Key Metrics**: Tasks completed, days remaining, budget usage, team velocity
+- **Status Indicators**: Color-coded status badges for project health
+- **Real-time Updates**: Last updated timestamps with relative time display
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Task Management
+- **Task Cards**: Interactive cards with progress bars and status indicators
+- **Search & Filtering**: Advanced filtering by status, priority, and search terms
+- **Priority System**: Visual priority indicators (Critical, High, Medium, Low)
+- **Progress Tracking**: Real-time progress visualization
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Blocker Management
+- **Active Blockers**: Prominent display of project blockers
+- **Blocker Details**: Priority levels and resolution tracking
+- **Quick Actions**: Easy access to blocker information
 
-### `npm test`
+Sanity check
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Responsive Design
+- **Mobile-First**: Fully responsive across all device sizes
+- **Touch Optimized**: Mobile-friendly interactions
+- **Accessibility**: WCAG 2.1 compliant with keyboard navigation
 
-### `npm run build`
+## 🛠️ Technology Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **Framer Motion** for animations
+- **Heroicons** for icons
+- **Recharts** for data visualization
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📦 Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd project-dashboard
+```
 
-### `npm run eject`
+2. Install dependencies:
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. Start the development server:
+```bash
+npm start
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 🎯 Usage
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Login
+- Use any email from the mock data: `john.smith@company.com`, `sarah.johnson@company.com`, etc.
+- Password can be any 6+ character string
+- The app will authenticate and show the dashboard
 
-## Learn More
+### Dashboard Navigation
+- **Project Overview**: View project progress and key metrics
+- **Task Cards**: Click on any task card to view details (currently logs to console)
+- **Search & Filter**: Use the search bar and filters to find specific tasks
+- **Notifications**: Click the bell icon to view recent notifications
+- **User Profile**: Click your profile to access settings or logout
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Mock Data
+The application includes realistic mock data for:
+- 1 active project (E-Commerce Platform Redesign)
+- 5 tasks with varying statuses and priorities
+- 4 team members with different roles
+- Active blockers and task updates
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🏗️ Project Structure
+
+```
+src/
+├── components/
+│   ├── Auth/
+│   │   └── LoginScreen.tsx
+│   ├── Dashboard/
+│   │   ├── Dashboard.tsx
+│   │   ├── ProjectOverview.tsx
+│   │   └── TaskCard.tsx
+│   └── Layout/
+│       └── Header.tsx
+├── data/
+│   └── mockData.ts
+├── types/
+│   └── index.ts
+├── App.tsx
+└── index.tsx
+```
+
+## 🎨 Design System
+
+### Colors
+- **Primary**: Blue (#3B82F6)
+- **Success**: Green (#22C55E)
+- **Warning**: Yellow (#F59E0B)
+- **Danger**: Red (#EF4444)
+
+### Components
+- **Cards**: Consistent card styling with hover effects
+- **Buttons**: Primary and secondary button variants
+- **Status Badges**: Color-coded status indicators
+- **Progress Bars**: Animated progress visualization
+
+## 🔧 Available Scripts
+
+- `npm start` - Runs the app in development mode
+- `npm test` - Launches the test runner
+- `npm run build` - Builds the app for production
+- `npm run eject` - Ejects from Create React App
+
+## 📱 Responsive Breakpoints
+
+- **Mobile**: < 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: > 1024px
+
+## 🚀 Future Enhancements
+
+- Task detail screens with full CRUD operations
+- Team management interface
+- Kanban board view
+- Reporting and analytics
+- Real-time notifications
+- Dark mode toggle
+- Export functionality
+- API integration
+
+## 📄 License
+
+This project is a POC and is intended for demonstration purposes.
+
+---
+
+**Your Project, Your Clarity** ✨
