@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeftIcon,
-  CheckIcon,
-  XMarkIcon,
-  FunnelIcon,
-  MagnifyingGlassIcon,
-  ExclamationTriangleIcon
+  ArrowLeftIcon, 
+  CheckIcon, 
+  XMarkIcon, 
+  FunnelIcon, 
+  MagnifyingGlassIcon, 
+  ExclamationTriangleIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
-import { AIUpdate } from '../../types/aiUpdates';
-import { mockAIUpdates } from '../../data/aiMockData';
+import { AIUpdate } from '../../types/fiveDays';
+import { mockAIUpdates, mockMondayItems } from '../../data/mondayMockData';
 import UpdateCard from './UpdateCard';
 
 interface PendingUpdatesReviewProps {
@@ -17,9 +18,9 @@ interface PendingUpdatesReviewProps {
   onUpdateApproved: (update: AIUpdate) => void;
 }
 
-const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
-  onBack,
-  onUpdateApproved
+const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({ 
+  onBack, 
+  onUpdateApproved 
 }) => {
   const [updates, setUpdates] = useState<AIUpdate[]>(mockAIUpdates);
   const [selectedUpdates, setSelectedUpdates] = useState<string[]>([]);
@@ -30,7 +31,7 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
 
   const filteredUpdates = updates.filter(update => {
     const matchesSearch = update.taskName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         update.aiNotes.toLowerCase().includes(searchTerm.toLowerCase());
+                         update.proposedAssignee.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || update.proposedStatus === statusFilter;
     const matchesSource = sourceFilter === 'all' || update.source === sourceFilter;
     
@@ -56,7 +57,8 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
   const handleApprove = (updateId: string) => {
     const update = updates.find(u => u.id === updateId);
     if (update) {
-      onUpdateApproved(update);
+      const updatedUpdate = { ...update, isApproved: true };
+      onUpdateApproved(updatedUpdate);
       setUpdates(prev => prev.filter(u => u.id !== updateId));
       setSelectedUpdates(prev => prev.filter(id => id !== updateId));
     }
@@ -68,9 +70,8 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
   };
 
   const handleEdit = (update: AIUpdate) => {
-    // For now, just log the edit action
     console.log('Edit update:', update);
-    // In a real implementation, this would open an edit modal
+    // In a real app, this would open an edit modal
   };
 
   const handleApproveAllSelected = () => {
@@ -85,16 +86,34 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
     setShowDiscardAllConfirm(false);
   };
 
-  const getSourceLabel = (source: string) => {
-    return source === 'daily-scrum' ? 'Daily Scrum' : 'Weekly Email';
+  const getSourceIcon = (source: string) => {
+    switch (source) {
+      case 'daily-scrum':
+        return '🎤';
+      case 'weekly-email':
+        return '📧';
+      case 'sprint-planning':
+        return '📅';
+      default:
+        return '📄';
+    }
   };
 
-  const getStatusLabel = (status: string) => {
-    return status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const getSourceLabel = (source: string) => {
+    switch (source) {
+      case 'daily-scrum':
+        return 'Daily Scrum';
+      case 'weekly-email':
+        return 'Weekly Email';
+      case 'sprint-planning':
+        return 'Sprint Planning';
+      default:
+        return 'Unknown';
+    }
   };
 
   return (
-    <motion.div
+    <motion.div 
       className="space-y-6"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -102,50 +121,54 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <motion.button
             onClick={onBack}
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <ArrowLeftIcon className="w-6 h-6" />
+            <ArrowLeftIcon className="w-5 h-5" />
           </motion.button>
           
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Pending AI Updates Review</h2>
-            <p className="text-gray-600 mt-1">
-              Review and approve AI-generated updates from Daily Scrums and weekly emails
-            </p>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <SparklesIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Review & Approve AI Updates</h2>
+              <p className="text-sm text-gray-500">
+                Review AI-generated updates before they appear on the client dashboard
+              </p>
+            </div>
           </div>
         </div>
 
-        {updates.length > 0 && (
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
+          {selectedUpdates.length > 0 && (
             <motion.button
               onClick={handleApproveAllSelected}
-              disabled={selectedUpdates.length === 0}
-              className={`btn-primary flex items-center space-x-2 ${
-                selectedUpdates.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              whileHover={selectedUpdates.length > 0 ? { scale: 1.02 } : {}}
-              whileTap={selectedUpdates.length > 0 ? { scale: 0.98 } : {}}
+              className="btn-primary flex items-center space-x-2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <CheckIcon className="w-4 h-4" />
               <span>Approve Selected ({selectedUpdates.length})</span>
             </motion.button>
-            
-            <motion.button
-              onClick={() => setShowDiscardAllConfirm(true)}
-              className="btn-secondary flex items-center space-x-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <XMarkIcon className="w-4 h-4" />
-              <span>Discard All</span>
-            </motion.button>
-          </div>
-        )}
+          )}
+          
+          <motion.button
+            onClick={() => setShowDiscardAllConfirm(true)}
+            className="btn-secondary flex items-center space-x-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <XMarkIcon className="w-4 h-4" />
+            <span>Discard All</span>
+          </motion.button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -155,19 +178,20 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search updates..."
+              placeholder="Search tasks or assignees..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
+          <FunnelIcon className="w-4 h-4 text-gray-400" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="all">All Status</option>
             <option value="not-started">Not Started</option>
@@ -179,11 +203,12 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="all">All Sources</option>
             <option value="daily-scrum">Daily Scrum</option>
             <option value="weekly-email">Weekly Email</option>
+            <option value="sprint-planning">Sprint Planning</option>
           </select>
         </div>
       </div>
@@ -195,7 +220,7 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
             type="checkbox"
             checked={selectedUpdates.length === filteredUpdates.length}
             onChange={handleSelectAll}
-            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
           />
           <span className="text-sm text-gray-600">
             Select all ({filteredUpdates.length} updates)
@@ -215,6 +240,7 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
               onEdit={handleEdit}
               isSelected={selectedUpdates.includes(update.id)}
               onSelect={handleSelectUpdate}
+              mondayItems={mockMondayItems}
             />
           ))}
         </AnimatePresence>
@@ -222,36 +248,40 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
 
       {/* Empty State */}
       {filteredUpdates.length === 0 && (
-        <motion.div 
+        <motion.div
           className="text-center py-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <FunnelIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No updates found</h3>
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <SparklesIcon className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No updates to review</h3>
           <p className="text-gray-500">
-            {searchTerm || statusFilter !== 'all' || sourceFilter !== 'all'
-              ? 'Try adjusting your search or filters'
-              : 'No pending AI updates to review'
+            {updates.length === 0 
+              ? "Upload some files to get started with AI processing"
+              : "No updates match your current filters"
             }
           </p>
         </motion.div>
       )}
 
-      {/* Discard All Confirmation */}
+      {/* Discard All Confirmation Modal */}
       <AnimatePresence>
         {showDiscardAllConfirm && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setShowDiscardAllConfirm(false)}
           >
             <motion.div
-              className="bg-white rounded-lg p-6 max-w-md mx-4"
+              className="bg-white rounded-lg p-6 max-w-md w-full"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-danger-100 rounded-full flex items-center justify-center">
@@ -259,24 +289,25 @@ const PendingUpdatesReview: React.FC<PendingUpdatesReviewProps> = ({
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Discard All Updates</h3>
-                  <p className="text-sm text-gray-600">This action cannot be undone</p>
+                  <p className="text-sm text-gray-500">This action cannot be undone</p>
                 </div>
               </div>
               
-              <p className="text-gray-700 mb-6">
-                Are you sure you want to discard all {updates.length} pending updates? This action cannot be undone.
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to discard all {updates.length} pending updates? 
+                This will permanently remove them from the review queue.
               </p>
               
               <div className="flex items-center justify-end space-x-3">
                 <button
                   onClick={() => setShowDiscardAllConfirm(false)}
-                  className="btn-secondary"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDiscardAll}
-                  className="bg-danger-600 hover:bg-danger-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                  className="px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700 transition-colors"
                 >
                   Discard All
                 </button>
