@@ -3,21 +3,29 @@ import { motion } from 'framer-motion';
 import { 
   PlusIcon,
   FunnelIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import ProjectOverview from './ProjectOverview';
 import TaskCard from './TaskCard';
+import AIUpdatesSection from '../AIUpdates/AIUpdatesSection';
+import PendingUpdatesReview from '../AIUpdates/PendingUpdatesReview';
 import { mockProject, mockTasks, mockDashboardStats } from '../../data/mockData';
-import { Task } from '../../types';
+import { AIUpdate } from '../../types/aiUpdates';
+import { AnimatePresence } from 'framer-motion';
 
 interface DashboardProps {
   onTaskClick: (taskId: string) => void;
 }
 
+type DashboardView = 'overview' | 'ai-updates' | 'pending-review';
+
 const Dashboard: React.FC<DashboardProps> = ({ onTaskClick }) => {
+  const [currentView, setCurrentView] = useState<DashboardView>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [pendingUpdatesCount, setPendingUpdatesCount] = useState(5); // Mock count
 
   const filteredTasks = mockTasks.filter(task => {
     const matchesSearch = task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -32,8 +40,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onTaskClick }) => {
     task.blockers.filter(blocker => blocker.status === 'active')
   );
 
-  return (
-    <div className="p-6 space-y-6">
+  const handleUpdateApproved = (update: AIUpdate) => {
+    // In a real app, this would update the main dashboard
+    console.log('Update approved:', update);
+    setPendingUpdatesCount(prev => Math.max(0, prev - 1));
+  };
+
+  const renderOverviewView = () => (
+    <div className="space-y-6">
       {/* Project Overview */}
       <ProjectOverview project={mockProject} stats={mockDashboardStats} />
 
@@ -159,6 +173,96 @@ const Dashboard: React.FC<DashboardProps> = ({ onTaskClick }) => {
           </p>
         </motion.div>
       )}
+    </div>
+  );
+
+  const renderAIUpdatesView = () => (
+    <AIUpdatesSection
+      onNavigateToReview={() => setCurrentView('pending-review')}
+      pendingUpdatesCount={pendingUpdatesCount}
+    />
+  );
+
+  const renderPendingReviewView = () => (
+    <PendingUpdatesReview
+      onBack={() => setCurrentView('ai-updates')}
+      onUpdateApproved={handleUpdateApproved}
+    />
+  );
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setCurrentView('overview')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              currentView === 'overview'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Dashboard
+          </button>
+          
+          <button
+            onClick={() => setCurrentView('ai-updates')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-1 ${
+              currentView === 'ai-updates'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <SparklesIcon className="w-4 h-4" />
+            <span>AI Updates</span>
+            {pendingUpdatesCount > 0 && (
+              <span className="bg-primary-100 text-primary-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                {pendingUpdatesCount}
+              </span>
+            )}
+          </button>
+        </nav>
+      </div>
+
+      {/* Content */}
+      <AnimatePresence mode="wait">
+        {currentView === 'overview' && (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderOverviewView()}
+          </motion.div>
+        )}
+        
+        {currentView === 'ai-updates' && (
+          <motion.div
+            key="ai-updates"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderAIUpdatesView()}
+          </motion.div>
+        )}
+        
+        {currentView === 'pending-review' && (
+          <motion.div
+            key="pending-review"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderPendingReviewView()}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
